@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Redaman Fiber Optik – ODP Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2430;
+      --border: #30363d;
+      --accent: #00e5c0;
+      --accent-dim: rgba(0,229,192,0.12);
+      --warn: #f0a500;
+      --warn-dim: rgba(240,165,0,0.12);
+      --danger: #f85149;
+      --danger-dim: rgba(248,81,73,0.12);
+      --ok: #3fb950;
+      --ok-dim: rgba(63,185,80,0.12);
+      --info: #388bfd;
+      --info-dim: rgba(56,139,253,0.12);
+      --text: #e6edf3;
+      --text-muted: #7d8590;
+      --text-subtle: #484f58;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'Inter', sans-serif;
+      --radius: 8px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* HEADER */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo-mark {
+      width: 36px; height: 36px;
+      border: 2px solid var(--accent);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+    header h1 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+    header p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .grid-inputs {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* SECTION LABELS */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* FIELDS */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    input[type="number"], select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 14px;
+      padding: 0.55rem 0.75rem;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input[type="number"]:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237d8590' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 2rem;
+      cursor: pointer;
+    }
+    select option { background: #161b22; }
+
+    /* RESULTS GRID */
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .result-card .r-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .result-card .r-value {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* RX CARD big */
+    .rx-card {
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .rx-card .rx-number {
+      font-family: var(--mono);
+      font-size: 40px;
+      font-weight: 600;
+      line-height: 1;
+      min-width: 140px;
+      transition: color 0.3s;
+    }
+    .rx-card .rx-meta { flex: 1; }
+    .rx-card .rx-meta .rx-label-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .rx-card .rx-meta .rx-range {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+
+    /* STATUS BOX */
+    .status-box {
+      border-radius: var(--radius);
+      padding: 0.9rem 1.1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      border: 1px solid transparent;
+      transition: all 0.3s;
+    }
+    .status-box .status-icon {
+      font-size: 18px;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+    .status-box .status-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .status-box .status-msg {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Range indicator */
+    .range-bar-wrap {
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .range-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .range-bar {
+      height: 8px;
+      border-radius: 99px;
+      background: linear-gradient(to right, var(--danger) 0%, var(--danger) 15%, var(--warn) 20%, var(--ok) 35%, var(--ok) 65%, var(--warn) 80%, var(--danger) 85%, var(--danger) 100%);
+      position: relative;
+    }
+    .range-marker {
+      position: absolute;
+      top: -5px;
+      width: 4px;
+      height: 18px;
+      background: white;
+      border-radius: 2px;
+      transform: translateX(-50%);
+      transition: left 0.3s;
+      box-shadow: 0 0 6px rgba(255,255,255,0.6);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      font-size: 11px;
+      color: var(--text-subtle);
+      text-align: center;
+      font-family: var(--mono);
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 1rem; }
+      .container { padding: 1.25rem 1rem; }
+      .rx-card { flex-direction: column; gap: 0.5rem; }
+      .rx-card .rx-number { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">FO</div>
+  <div>
+    <h1>Kalkulator Redaman Fiber Optik</h1>
+    <p>Perencanaan link ODP / ODC – GPON / FTTH</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <p class="section-label">Parameter Kabel</p>
+  <div class="grid-inputs">
+    <div class="field">
+      <label for="length">Panjang kabel total (km)</label>
+      <input type="number" id="length" value="2" min="0" step="0.01">
+    </div>
+    <div class="field">
+      <label for="wavelength">Panjang gelombang</label>
+      <select id="wavelength">
+        <option value="0.35">1310 nm SM — 0.35 dB/km</option>
+        <option value="0.22" selected>1550 nm SM — 0.22 dB/km</option>
+        <option value="3.0">850 nm MM — 3.0 dB/km</option>
+      </select>
+    </div>
+  </div>
+
+  <p class="section-label">Konektor &amp; Splice</p>
+  <div class="grid-inputs">
+    <div class="field">
+      <label for="connectors">Jumlah konektor</label>
+      <input type="number" id="connectors" value="2" min="0" step="1">
+    </div>
+    <div class="field">
+      <label for="connLoss">Redaman per konektor (dB)</label>
+      <input type="number" id="connLoss" value="0.5" min="0" step="0.01">
+    </div>
+    <div class="field">
+      <label for="splices">Jumlah splice / sambungan</label>
+      <input type="number" id="splices" value="1" min="0" step="1">
+    </div>
+    <div class="field">
+      <label for="spliceLoss">Redaman per splice (dB)</label>
+      <input type="number" id="spliceLoss" value="0.1" min="0" step="0.01">
+    </div>
+  </div>
+
+  <p class="section-label">Splitter</p>
+  <div class="grid-inputs">
+    <div class="field">
+      <label for="splitter1">Splitter 1 – ODC</label>
+      <select id="splitter1">
+        <option value="0">Tidak ada</option>
+        <option value="3.5">1:2 — 3.5 dB</option>
+        <option value="7.0" selected>1:4 — 7.0 dB</option>
+        <option value="10.5">1:8 — 10.5 dB</option>
+        <option value="13.5">1:16 — 13.5 dB</option>
+        <option value="17.5">1:32 — 17.5 dB</option>
+        <option value="21">1:64 — 21.0 dB</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="splitter2">Splitter 2 – ODP</label>
+      <select id="splitter2">
+        <option value="0">Tidak ada</option>
+        <option value="3.5">1:2 — 3.5 dB</option>
+        <option value="7.0" selected>1:4 — 7.0 dB</option>
+        <option value="10.5">1:8 — 10.5 dB</option>
+        <option value="13.5">1:16 — 13.5 dB</option>
+        <option value="17.5">1:32 — 17.5 dB</option>
+      </select>
+    </div>
+  </div>
+
+  <p class="section-label">Daya Kirim OLT</p>
+  <div class="grid-inputs">
+    <div class="field">
+      <label for="txPower">Daya TX OLT (dBm)</label>
+      <input type="number" id="txPower" value="3" step="0.1">
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <p class="section-label" style="margin-top:0.5rem;">Hasil Perhitungan</p>
+
+  <div class="results-grid">
+    <div class="result-card">
+      <div class="r-label">Redaman kabel</div>
+      <div class="r-value" id="out-cable">—</div>
+    </div>
+    <div class="result-card">
+      <div class="r-label">Konektor + splice</div>
+      <div class="r-value" id="out-discrete">—</div>
+    </div>
+    <div class="result-card">
+      <div class="r-label">Total splitter</div>
+      <div class="r-value" id="out-splitter">—</div>
+    </div>
+    <div class="result-card" style="border-color: var(--info); background: var(--info-dim);">
+      <div class="r-label" style="color:var(--info);">Total redaman</div>
+      <div class="r-value" style="color:var(--info);" id="out-total">—</div>
+    </div>
+  </div>
+
+  <!-- RX POWER BIG CARD -->
+  <div class="rx-card" id="rx-card">
+    <div class="rx-number" id="out-rx">—</div>
+    <div class="rx-meta">
+      <div class="rx-label-text">Estimasi RX power di pelanggan</div>
+      <div class="rx-range">Rentang aman: -15 s/d -23 dBm</div>
+    </div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="status-box" id="status-box">
+    <div class="status-icon" id="status-icon">◉</div>
+    <div>
+      <div class="status-title" id="status-title"></div>
+      <div class="status-msg" id="status-msg"></div>
+    </div>
+  </div>
+
+  <!-- RANGE BAR -->
+  <div class="range-bar-wrap">
+    <div class="range-bar-label">
+      <span>Lemah &lt; -23 dBm</span>
+      <span>Zona aman</span>
+      <span>&gt; -15 dBm Kuat</span>
+    </div>
+    <div class="range-bar">
+      <div class="range-marker" id="range-marker"></div>
+    </div>
+  </div>
+
+  <p style="font-size:11px; color:var(--text-subtle); margin-top:1.25rem; font-family:var(--mono); line-height:1.6;">
+    Loss splitter (standar): 1:2=3.5 dB · 1:4=7.0 dB · 1:8=10.5 dB · 1:16=13.5 dB · 1:32=17.5 dB · 1:64=21 dB (termasuk excess loss)
+  </p>
+
+</div>
+
+<footer>Kalkulator Redaman Fiber Optik — GPON/FTTH ODP Planner</footer>
+
+<script>
+  const RX_MAX = -15;
+  const RX_MIN = -23;
+
+  function calc() {
+    const len        = parseFloat(document.getElementById('length').value)     || 0;
+    const wl         = parseFloat(document.getElementById('wavelength').value);
+    const conn       = parseFloat(document.getElementById('connectors').value)  || 0;
+    const connLoss   = parseFloat(document.getElementById('connLoss').value)    || 0;
+    const splices    = parseFloat(document.getElementById('splices').value)     || 0;
+    const spliceLoss = parseFloat(document.getElementById('spliceLoss').value)  || 0;
+    const sp1        = parseFloat(document.getElementById('splitter1').value)   || 0;
+    const sp2        = parseFloat(document.getElementById('splitter2').value)   || 0;
+    const tx         = parseFloat(document.getElementById('txPower').value)     || 0;
+
+    const cableLoss    = len * wl;
+    const discreteLoss = (conn * connLoss) + (splices * spliceLoss);
+    const splitterLoss = sp1 + sp2;
+    const total        = cableLoss + discreteLoss + splitterLoss;
+    const rx           = tx - total;
+
+    document.getElementById('out-cable').textContent    = cableLoss.toFixed(2)    + ' dB';
+    document.getElementById('out-discrete').textContent = discreteLoss.toFixed(2) + ' dB';
+    document.getElementById('out-splitter').textContent = splitterLoss.toFixed(2) + ' dB';
+    document.getElementById('out-total').textContent    = total.toFixed(2)        + ' dB';
+    document.getElementById('out-rx').textContent       = rx.toFixed(2)           + ' dBm';
+
+    // Status
+    let bgColor, borderColor, textColor, icon, title, msg;
+
+    if (rx > RX_MAX) {
+      bgColor     = 'var(--warn-dim)';
+      borderColor = 'var(--warn)';
+      textColor   = 'var(--warn)';
+      icon        = '⚠';
+      title       = 'Sinyal terlalu kuat';
+      msg         = 'RX power ' + rx.toFixed(2) + ' dBm melebihi -15 dBm. Risiko overload/saturasi ONU. Tambahkan attenuator, perbesar rasio splitter, atau tambah panjang kabel.';
+    } else if (rx >= RX_MIN) {
+      bgColor     = 'var(--ok-dim)';
+      borderColor = 'var(--ok)';
+      textColor   = 'var(--ok)';
+      icon        = '✓';
+      title       = 'Sinyal dalam rentang aman';
+      msg         = 'RX power ' + rx.toFixed(2) + ' dBm berada di zona aman (-15 s/d -23 dBm). Link siap digunakan.';
+    } else if (rx >= RX_MIN - 2) {
+      bgColor     = 'var(--warn-dim)';
+      borderColor = 'var(--warn)';
+      textColor   = 'var(--warn)';
+      icon        = '⚠';
+      title       = 'Mendekati batas minimum';
+      msg         = 'RX power ' + rx.toFixed(2) + ' dBm mendekati batas minimum -23 dBm. Margin sangat tipis — waspada degradasi sinyal.';
+    } else {
+      bgColor     = 'var(--danger-dim)';
+      borderColor = 'var(--danger)';
+      textColor   = 'var(--danger)';
+      icon        = '✕';
+      title       = 'Sinyal terlalu lemah';
+      msg         = 'RX power ' + rx.toFixed(2) + ' dBm di bawah -23 dBm. Kurangi rasio splitter, persingkat jarak kabel, atau kurangi jumlah sambungan.';
+    }
+
+    const rxCard = document.getElementById('rx-card');
+    rxCard.style.background   = bgColor;
+    rxCard.style.borderColor  = borderColor;
+    document.getElementById('out-rx').style.color    = textColor;
+    document.getElementById('status-box').style.background   = bgColor;
+    document.getElementById('status-box').style.borderColor  = borderColor;
+    document.getElementById('status-icon').textContent = icon;
+    document.getElementById('status-icon').style.color = textColor;
+    document.getElementById('status-title').textContent = title;
+    document.getElementById('status-title').style.color = textColor;
+    document.getElementById('status-msg').textContent   = msg;
+
+    // Range bar marker: map rx to 0-100%
+    // -28 dBm = 0%, -8 dBm = 100%
+    const pct = Math.min(100, Math.max(0, ((rx - (-28)) / ((-8) - (-28))) * 100));
+    document.getElementById('range-marker').style.left = pct + '%';
+  }
+
+  document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', calc));
+  calc();
+</script>
+</body>
+</html>
